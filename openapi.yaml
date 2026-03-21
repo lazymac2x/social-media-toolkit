@@ -1,0 +1,351 @@
+openapi: 3.0.3
+info:
+  title: Social Media Toolkit API
+  description: >
+    Generate hashtags, captions, content ideas, and analyze engagement metrics.
+    All logic is rule-based — no external AI APIs required.
+  version: 1.0.0
+  contact:
+    name: lazymac2x
+    url: https://github.com/lazymac2x/social-media-toolkit
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3500
+    description: Local development
+  - url: https://social-media-toolkit.p.rapidapi.com
+    description: RapidAPI production
+
+paths:
+  /:
+    get:
+      summary: API info and available endpoints
+      operationId: getInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/hashtags/{topic}:
+    get:
+      summary: Generate hashtags for a topic
+      operationId: generateHashtags
+      tags: [Hashtags]
+      parameters:
+        - name: topic
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Topic or keyword
+        - name: platform
+          in: query
+          schema:
+            type: string
+            enum: [instagram, twitter, tiktok, linkedin, facebook, youtube, pinterest, threads]
+            default: instagram
+        - name: count
+          in: query
+          schema:
+            type: integer
+        - name: competition
+          in: query
+          schema:
+            type: string
+            enum: [high, medium, low, mixed]
+            default: mixed
+      responses:
+        '200':
+          description: Generated hashtags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  topic:
+                    type: string
+                  platform:
+                    type: string
+                  count:
+                    type: integer
+                  hashtags:
+                    type: array
+                    items:
+                      type: string
+                  groups:
+                    type: object
+                    properties:
+                      high_competition:
+                        type: array
+                        items:
+                          type: string
+                      medium_competition:
+                        type: array
+                        items:
+                          type: string
+                      low_competition:
+                        type: array
+                        items:
+                          type: string
+
+  /api/v1/caption/{category}:
+    get:
+      summary: Generate a caption template
+      operationId: generateCaption
+      tags: [Captions]
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [question, stat, story, challenge, controversial, educational]
+        - name: topic
+          in: query
+          schema:
+            type: string
+        - name: mood
+          in: query
+          schema:
+            type: string
+            enum: [excited, calm, professional, funny, inspiring, love, warning, educational]
+        - name: cta_type
+          in: query
+          schema:
+            type: string
+            enum: [engagement, follow, link, sale]
+        - name: platform
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Generated caption
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  category:
+                    type: string
+                  hook:
+                    type: string
+                  body:
+                    type: string
+                  cta:
+                    type: string
+                  full_caption:
+                    type: string
+                  emoji_suggestions:
+                    type: array
+                    items:
+                      type: string
+
+  /api/v1/best-times/{platform}:
+    get:
+      summary: Get best posting times for a platform
+      operationId: getBestTimes
+      tags: [Scheduler]
+      parameters:
+        - name: platform
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [instagram, twitter, tiktok, linkedin, facebook, youtube, pinterest]
+        - name: timezone
+          in: query
+          schema:
+            type: string
+            default: UTC
+        - name: day
+          in: query
+          schema:
+            type: string
+            enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+      responses:
+        '200':
+          description: Best posting times
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid platform or day
+
+  /api/v1/engagement:
+    post:
+      summary: Calculate engagement metrics
+      operationId: calculateEngagement
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [followers]
+              properties:
+                followers:
+                  type: number
+                  description: Total follower count
+                likes:
+                  type: number
+                comments:
+                  type: number
+                shares:
+                  type: number
+                saves:
+                  type: number
+                impressions:
+                  type: number
+                views:
+                  type: number
+      responses:
+        '200':
+          description: Engagement analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  engagement_rate:
+                    type: number
+                  rating:
+                    type: string
+                  breakdown:
+                    type: object
+        '400':
+          description: Invalid input
+
+  /api/v1/content-ideas/{niche}:
+    get:
+      summary: Generate content ideas for a niche
+      operationId: generateContentIdeas
+      tags: [Content Ideas]
+      parameters:
+        - name: niche
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: count
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [carousel, reel, story, single_image, video, live, text_post, poll, thread]
+      responses:
+        '200':
+          description: Content ideas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  niche:
+                    type: string
+                  count:
+                    type: integer
+                  ideas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        format:
+                          type: string
+                        description:
+                          type: string
+
+  /api/v1/growth-rate:
+    post:
+      summary: Calculate follower growth rate
+      operationId: calculateGrowthRate
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_followers, previous_followers]
+              properties:
+                current_followers:
+                  type: number
+                previous_followers:
+                  type: number
+                days:
+                  type: number
+                  default: 30
+      responses:
+        '200':
+          description: Growth rate analysis
+
+  /api/v1/content-score:
+    post:
+      summary: Score content performance
+      operationId: scoreContent
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [followers]
+              properties:
+                likes:
+                  type: number
+                comments:
+                  type: number
+                shares:
+                  type: number
+                saves:
+                  type: number
+                followers:
+                  type: number
+      responses:
+        '200':
+          description: Content performance score
+
+  /api/v1/milestones:
+    post:
+      summary: Estimate follower milestone timelines
+      operationId: estimateMilestones
+      tags: [Analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_followers]
+              properties:
+                current_followers:
+                  type: number
+                daily_growth:
+                  type: number
+                monthly_growth_rate:
+                  type: number
+      responses:
+        '200':
+          description: Milestone estimates
+
+  /api/v1/categories:
+    get:
+      summary: List hashtag categories and platform limits
+      operationId: getCategories
+      tags: [Hashtags]
+      responses:
+        '200':
+          description: Available categories

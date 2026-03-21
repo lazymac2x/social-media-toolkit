@@ -1,0 +1,26 @@
+{
+  "name": "social-media-toolkit",
+  "version": "1.0.0",
+  "description": "Social media content generation and analysis API + MCP server. Generate hashtags, captions, content ideas, and analyze engagement — all rule-based, no external AI APIs.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "mcp": "node src/mcp-server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "social-media",
+    "hashtags",
+    "captions",
+    "engagement",
+    "analytics",
+    "mcp",
+    "content-generation"
+  ],
+  "author": "lazymac2x",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
+  }
+}
